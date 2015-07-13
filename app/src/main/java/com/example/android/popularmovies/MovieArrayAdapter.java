@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
+import com.example.android.popularmovies.data.MovieItem;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -19,13 +20,13 @@ public class MovieArrayAdapter extends ArrayAdapter {
 
     private Context mContext;
     private int mLayoutResourceId;
-    private ArrayList<String> mPostersPath;
+    private ArrayList<MovieItem> mMoviesInfo;
 
     public MovieArrayAdapter(Context context, int layoutResourceId, ArrayList data) {
         super(context, layoutResourceId, data);
 
         mContext = context;
-        mPostersPath = data;
+        mMoviesInfo = data;
         mLayoutResourceId = layoutResourceId;
     }
 
@@ -43,7 +44,7 @@ public class MovieArrayAdapter extends ArrayAdapter {
         } else {
             holder = (ViewHolder) row.getTag();
         }
-        Picasso.with(mContext).load("http://image.tmdb.org/t/p/w185//" + mPostersPath.get(position)).into(holder.image);
+        Picasso.with(mContext).load("http://image.tmdb.org/t/p/w185//" + mMoviesInfo.get(position).moviePosterThumbnail).into(holder.image);
 
         return row;
     }

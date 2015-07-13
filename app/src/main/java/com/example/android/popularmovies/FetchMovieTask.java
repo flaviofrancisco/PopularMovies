@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import com.example.android.popularmovies.data.MovieItem;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,7 +24,7 @@ import java.util.Arrays;
 /**
  * Created by Flavio on 7/11/2015.
  */
-public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<String>> {
+public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieItem>> {
 
     private final Context mContext;
 
@@ -31,7 +33,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<String>> {
     }
 
     @Override
-    protected ArrayList<String> doInBackground(String... params) {
+    protected ArrayList<MovieItem> doInBackground(String... params) {
 
         if (params.length == 0) {
             return null;
@@ -112,9 +114,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<String>> {
         return null;
     }
 
-    private ArrayList<String> getMovieDataFromJson(String moviesJsonStr) throws JSONException {
+    private ArrayList<MovieItem> getMovieDataFromJson(String moviesJsonStr) throws JSONException {
 
-        final String POSTER_PATH = "poster_path";
         final String MOVIES_RESULTS = "results";
 
         try {
@@ -123,24 +124,29 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<String>> {
             JSONArray resultsArray = moviesJson.getJSONArray(MOVIES_RESULTS);
 
             int count = resultsArray.length();
-            String[] posterPaths = new String[count];
+            MovieItem[] movieItems = new MovieItem[count];
 
 
             for(int i = 0; i <= count - 1; i++) {
 
-                JSONObject movieItem = resultsArray.getJSONObject(i);
-                String poster_path = movieItem.getString(POSTER_PATH);
-                posterPaths[i] = poster_path;
+                JSONObject jsonObjectMovie = resultsArray.getJSONObject(i);
+                String poster_path = jsonObjectMovie.getString(MovieItem.POSTER_PATH);
+                String originalTitle = jsonObjectMovie.getString(MovieItem.ORIGINAL_TITLE);
+                String overview = jsonObjectMovie.getString(MovieItem.OVERVIEW);
+                String vote_average = jsonObjectMovie.getString(MovieItem.VOTE_AVERAGE);
+                String release_date = jsonObjectMovie.getString(MovieItem.RELEASE_DATE);
+
+                movieItems[i] = new MovieItem(originalTitle, poster_path,overview, vote_average, release_date);
 
             }
 
-            return new ArrayList<String>(Arrays.asList(posterPaths));
+            return new ArrayList<MovieItem>(Arrays.asList(movieItems));
 
         } catch (JSONException e) {
 //        Log.e(LOG_TAG, e.getMessage(), e);
         e.printStackTrace();
     }
 
-        return new ArrayList<String>();
+        return new ArrayList<MovieItem>();
     }
 }

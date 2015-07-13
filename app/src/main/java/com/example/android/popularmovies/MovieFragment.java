@@ -1,18 +1,18 @@
 package com.example.android.popularmovies;
 
-import android.database.Cursor;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ListView;
+
+import com.example.android.popularmovies.data.MovieItem;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutionException;
 /**
  * Created by Flavio on 7/11/2015.
  */
-public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MovieFragment extends Fragment {
 
     private GridView mGridViewMovies;
     private int mPosition = GridView.INVALID_POSITION;
@@ -56,7 +56,29 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mGridViewMovies = (GridView) rootView.findViewById(R.id.grid_movie_images);
+
         updateMoviesList();
+
+        mGridViewMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                MovieItem movieInfo = (MovieItem) mMovieArrayAdapter.getItem(position);
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+
+                    intent.putExtra(MovieItem.ORIGINAL_TITLE, movieInfo.originalTitle);
+                    intent.putExtra(MovieItem.POSTER_PATH, movieInfo.moviePosterThumbnail);
+                    intent.putExtra(MovieItem.OVERVIEW, movieInfo.synopsis);
+                    intent.putExtra(MovieItem.RELEASE_DATE, movieInfo.releaseDate);
+                    intent.putExtra(MovieItem.VOTE_AVERAGE, movieInfo.rating);
+
+                mPosition = position;
+
+                startActivity(intent);
+            }
+        });
+
         mGridViewMovies.setAdapter(mMovieArrayAdapter);
 
         return  rootView;
@@ -65,19 +87,19 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     private void updateMoviesList() {
         FetchMovieTask movieTask = new FetchMovieTask(getActivity());
 
-        ArrayList<String> posterPaths = new ArrayList<String>();
+        ArrayList<MovieItem> moveItem = new ArrayList<MovieItem>();
 
         String sortMethod = Utils.getPreferredSortMethod(getActivity());
 
         try {
-            posterPaths = movieTask.execute(sortMethod).get();
+            moveItem = movieTask.execute(sortMethod).get();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
 
-        mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, posterPaths);
+        mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, moveItem);
     }
 
     @Override
@@ -85,28 +107,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         super.onStart();
         updateMoviesList();
         mGridViewMovies.setAdapter(mMovieArrayAdapter);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mMovieAdapter.swapCursor(data);
-        if (mPosition != ListView.INVALID_POSITION) {
-            mGridViewMovies.smoothScrollToPosition(mPosition);
-        }
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> loader) {
-        mMovieAdapter.swapCursor(null);
-    }
-
-    public interface CallBack {
-
     }
 
 }

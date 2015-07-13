@@ -6,13 +6,12 @@
     tools:context="com.example.android.popularmovies.MovieFragment">
 
     <GridView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_gravity="top"
         android:verticalSpacing="0dp"
         android:horizontalSpacing="0dp"
         android:stretchMode="columnWidth"
         android:numColumns="2"
         android:id="@+id/grid_movie_images"></GridView>
-
 </LinearLayout>

@@ -9,6 +9,6 @@
     <string name="pref_sort_by_value_popular">popularity.desc</string>
     <string name="pref_sort_by_label_rated">Highest Rated</string>
     <string name="pref_sort_by_value_rated">vote_count.desc</string>
-
+    <string name="title_activity_detail">Movie Detail</string>
     <string name="title_activity_settings">Settings</string>
 </resources>
