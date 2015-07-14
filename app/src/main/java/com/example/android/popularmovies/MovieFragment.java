@@ -45,7 +45,7 @@ public class MovieFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-        int id = item.getItemId();
+//        int id = item.getItemId();
         return super.onOptionsItemSelected(item);
     }
 

@@ -96,8 +96,6 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
             e.printStackTrace();
         } catch (SecurityException e){
             e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
@@ -136,19 +134,19 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
                 String originalTitle = jsonObjectMovie.getString(MovieItem.ORIGINAL_TITLE);
                 String overview = jsonObjectMovie.getString(MovieItem.OVERVIEW);
                 String vote_average = mContext.getString(R.string.format_full_friendly_rate, jsonObjectMovie.getString(MovieItem.VOTE_AVERAGE));
-                String release_date = jsonObjectMovie.getString(MovieItem.RELEASE_DATE).substring(0,4);
+                String release_date = jsonObjectMovie.getString(MovieItem.RELEASE_DATE);
 
                 movieItems[i] = new MovieItem(id, originalTitle, poster_path,overview, vote_average, release_date);
 
             }
 
-            return new ArrayList<>(Arrays.asList(movieItems));
+            return new ArrayList<MovieItem>(Arrays.asList(movieItems));
 
         } catch (JSONException e) {
 //        Log.e(LOG_TAG, e.getMessage(), e);
         e.printStackTrace();
-    }
+        }
 
-        return new ArrayList<>();
+        return new ArrayList<MovieItem>();
     }
 }
