@@ -33,7 +33,7 @@ public class MovieArrayAdapter extends ArrayAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         View row = convertView;
-        ViewHolder holder = null;
+        ViewHolder holder;
 
         if (row == null) {
             LayoutInflater inflater = ((Activity) mContext).getLayoutInflater();
@@ -44,7 +44,7 @@ public class MovieArrayAdapter extends ArrayAdapter {
         } else {
             holder = (ViewHolder) row.getTag();
         }
-        Picasso.with(mContext).load("http://image.tmdb.org/t/p/w185//" + mMoviesInfo.get(position).moviePosterThumbnail).into(holder.image);
+        Picasso.with(mContext).load("http://image.tmdb.org/t/p/w185//" + mMoviesInfo.get(position).getMoviePosterThumbnail()).into(holder.image);
 
         return row;
     }

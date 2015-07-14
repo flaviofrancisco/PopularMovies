@@ -24,11 +24,11 @@ import java.util.Arrays;
 /**
  * Created by Flavio on 7/11/2015.
  */
-public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieItem>> {
+public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem>> {
 
-    private final Context mContext;
+    Context mContext;
 
-    public FetchMovieTask(Context context) {
+    public FetchMoviesTask(Context context) {
         mContext = context;
     }
 
@@ -130,23 +130,25 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieItem>
             for(int i = 0; i <= count - 1; i++) {
 
                 JSONObject jsonObjectMovie = resultsArray.getJSONObject(i);
+
+                String id = jsonObjectMovie.getString(MovieItem.ID);
                 String poster_path = jsonObjectMovie.getString(MovieItem.POSTER_PATH);
                 String originalTitle = jsonObjectMovie.getString(MovieItem.ORIGINAL_TITLE);
                 String overview = jsonObjectMovie.getString(MovieItem.OVERVIEW);
-                String vote_average = jsonObjectMovie.getString(MovieItem.VOTE_AVERAGE);
-                String release_date = jsonObjectMovie.getString(MovieItem.RELEASE_DATE);
+                String vote_average = mContext.getString(R.string.format_full_friendly_rate, jsonObjectMovie.getString(MovieItem.VOTE_AVERAGE));
+                String release_date = jsonObjectMovie.getString(MovieItem.RELEASE_DATE).substring(0,4);
 
-                movieItems[i] = new MovieItem(originalTitle, poster_path,overview, vote_average, release_date);
+                movieItems[i] = new MovieItem(id, originalTitle, poster_path,overview, vote_average, release_date);
 
             }
 
-            return new ArrayList<MovieItem>(Arrays.asList(movieItems));
+            return new ArrayList<>(Arrays.asList(movieItems));
 
         } catch (JSONException e) {
 //        Log.e(LOG_TAG, e.getMessage(), e);
         e.printStackTrace();
     }
 
-        return new ArrayList<MovieItem>();
+        return new ArrayList<>();
     }
 }

@@ -23,9 +23,9 @@ import java.util.concurrent.ExecutionException;
 public class MovieFragment extends Fragment {
 
     private GridView mGridViewMovies;
-    private int mPosition = GridView.INVALID_POSITION;
-    MovieAdapter mMovieAdapter;
     MovieArrayAdapter mMovieArrayAdapter;
+    private int mPosition = GridView.INVALID_POSITION;
+    private static final String SELECTED_KEY = "selected_position";
 
     public MovieFragment(){
 
@@ -59,33 +59,35 @@ public class MovieFragment extends Fragment {
 
         updateMoviesList();
 
+        mGridViewMovies.setAdapter(mMovieArrayAdapter);
+
         mGridViewMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
                 MovieItem movieInfo = (MovieItem) mMovieArrayAdapter.getItem(position);
                 Intent intent = new Intent(getActivity(), DetailActivity.class);
 
-                    intent.putExtra(MovieItem.ORIGINAL_TITLE, movieInfo.originalTitle);
-                    intent.putExtra(MovieItem.POSTER_PATH, movieInfo.moviePosterThumbnail);
-                    intent.putExtra(MovieItem.OVERVIEW, movieInfo.synopsis);
-                    intent.putExtra(MovieItem.RELEASE_DATE, movieInfo.releaseDate);
-                    intent.putExtra(MovieItem.VOTE_AVERAGE, movieInfo.rating);
-
+                intent.putExtra(MovieItem.ORIGINAL_TITLE, movieInfo.getOriginalTitle());
+                intent.putExtra(MovieItem.POSTER_PATH, movieInfo.getMoviePosterThumbnail());
+                intent.putExtra(MovieItem.OVERVIEW, movieInfo.getSynopsis());
+                intent.putExtra(MovieItem.RELEASE_DATE, movieInfo.getReleaseDate());
+                intent.putExtra(MovieItem.VOTE_AVERAGE, movieInfo.getRating());
                 mPosition = position;
-
                 startActivity(intent);
             }
         });
 
-        mGridViewMovies.setAdapter(mMovieArrayAdapter);
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
 
         return  rootView;
     }
 
     private void updateMoviesList() {
-        FetchMovieTask movieTask = new FetchMovieTask(getActivity());
+        FetchMoviesTask movieTask = new FetchMoviesTask(getActivity());
 
         ArrayList<MovieItem> moveItem = new ArrayList<MovieItem>();
 
@@ -107,6 +109,14 @@ public class MovieFragment extends Fragment {
         super.onStart();
         updateMoviesList();
         mGridViewMovies.setAdapter(mMovieArrayAdapter);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (mPosition != GridView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
+        super.onSaveInstanceState(outState);
     }
 
 }
