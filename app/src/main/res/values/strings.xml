@@ -6,11 +6,12 @@
     <string name="pref_sort_by_key" translatable="false">sort</string>
     <string name="pref_sort_by_default" translatable="false">popularity.desc</string>
     <string name="pref_sort_by_label_popular">Most Popular</string>
-    <string name="pref_sort_by_value_popular">popularity.desc</string>
+    <string name="pref_sort_by_value_popular" translatable="false">popularity.desc</string>
     <string name="pref_sort_by_label_rated">Highest Rated</string>
-    <string name="pref_sort_by_value_rated">vote_average.desc</string>
+    <string name="pref_sort_by_value_rated" translatable="false">vote_average.desc</string>
     <string name="title_activity_detail">Movie Detail</string>
     <string name="title_activity_settings">Settings</string>
     <!-- Rate [CHAR LIMIT=NONE] -->
     <string name="format_full_friendly_rate"><xliff:g id="rate">%1$s</xliff:g>/10.0</string>
+    <string name="info_no_connection_available">Sorry, this app is not able to retrieve the info about the movies. Please, check if this device has an internet connection!</string>
 </resources>

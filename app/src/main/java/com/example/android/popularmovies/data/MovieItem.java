@@ -1,9 +1,12 @@
 package com.example.android.popularmovies.data;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Flavio on 7/11/2015.
  */
-public class MovieItem {
+public class MovieItem implements Parcelable {
 
     public static final String POSTER_PATH = "poster_path";
     public static final String ORIGINAL_TITLE = "original_title";
@@ -75,5 +78,21 @@ public class MovieItem {
         setSynopsis(overview);
         setRating(vote_average);
         setReleaseDate(rdate);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(moviePosterThumbnail);
+        dest.writeString(originalTitle);
+        dest.writeString(moviePosterThumbnail);
+        dest.writeString(synopsis);
+        dest.writeString(rating);
+        dest.writeString(releaseDate);
     }
 }

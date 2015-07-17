@@ -59,6 +59,12 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
 
             URL url = new URL(builtUri.toString());
 
+            CheckConnectivity checkConnectivity = new CheckConnectivity();
+
+            if(!checkConnectivity.isNetworkConnected(mContext) || checkConnectivity.isInternetAvailable(builtUri.toString())) {
+                return new ArrayList<>();
+            }
+
             urlConnection = (HttpURLConnection) url.openConnection();
             urlConnection.setRequestMethod("GET");
             urlConnection.connect();
@@ -149,4 +155,5 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
 
         return new ArrayList<MovieItem>();
     }
+
 }

@@ -9,8 +9,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.GridView;
+import android.widget.Toast;
 
 import com.example.android.popularmovies.data.MovieItem;
 
@@ -24,12 +26,13 @@ public class MovieFragment extends Fragment {
 
     private GridView mGridViewMovies;
     MovieArrayAdapter mMovieArrayAdapter;
+    private ArrayList<MovieItem> mMoveItem;
+
     private int mPosition = GridView.INVALID_POSITION;
-    private static final String SELECTED_KEY = "selected_position";
+    private final String MOVIE_LIST_KEY = "movie_list_key";
+    private final String SELECTED_KEY="selected_position";
 
-    public MovieFragment(){
-
-    }
+    public MovieFragment(){ }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,7 +48,6 @@ public class MovieFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
-//        int id = item.getItemId();
         return super.onOptionsItemSelected(item);
     }
 
@@ -57,66 +59,102 @@ public class MovieFragment extends Fragment {
 
         mGridViewMovies = (GridView) rootView.findViewById(R.id.grid_movie_images);
 
-        updateMoviesList();
+        if(savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_LIST_KEY)) {
+            updateMoviesList();
+        } else {
+            mMoveItem = savedInstanceState.getParcelableArrayList(MOVIE_LIST_KEY);
+        }
 
-        mGridViewMovies.setAdapter(mMovieArrayAdapter);
+        mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, mMoveItem);
 
-        mGridViewMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            mGridViewMovies.setAdapter(mMovieArrayAdapter);
+
+            mGridViewMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+                    MovieItem movieInfo = (MovieItem) mMovieArrayAdapter.getItem(position);
+                    Intent intent = new Intent(getActivity(), DetailActivity.class);
+
+                    intent.putExtra(MovieItem.ORIGINAL_TITLE, movieInfo.getOriginalTitle());
+                    intent.putExtra(MovieItem.POSTER_PATH, movieInfo.getMoviePosterThumbnail());
+                    intent.putExtra(MovieItem.OVERVIEW, movieInfo.getSynopsis());
+                    intent.putExtra(MovieItem.RELEASE_DATE, movieInfo.getReleaseDate());
+                    intent.putExtra(MovieItem.VOTE_AVERAGE, movieInfo.getRating());
+                    startActivity(intent);
+                }
+            });
+
+        mGridViewMovies.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+
+            }
 
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-
-                MovieItem movieInfo = (MovieItem) mMovieArrayAdapter.getItem(position);
-                Intent intent = new Intent(getActivity(), DetailActivity.class);
-
-                intent.putExtra(MovieItem.ORIGINAL_TITLE, movieInfo.getOriginalTitle());
-                intent.putExtra(MovieItem.POSTER_PATH, movieInfo.getMoviePosterThumbnail());
-                intent.putExtra(MovieItem.OVERVIEW, movieInfo.getSynopsis());
-                intent.putExtra(MovieItem.RELEASE_DATE, movieInfo.getReleaseDate());
-                intent.putExtra(MovieItem.VOTE_AVERAGE, movieInfo.getRating());
-                mPosition = position;
-                startActivity(intent);
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+                mPosition = firstVisibleItem;
             }
         });
 
-        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        if(savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)){
+            mPosition =  savedInstanceState.getInt(SELECTED_KEY);
         }
 
         return  rootView;
     }
 
     private void updateMoviesList() {
-        FetchMoviesTask movieTask = new FetchMoviesTask(getActivity());
 
-        ArrayList<MovieItem> moveItem = new ArrayList<MovieItem>();
+        try{
 
-        String sortMethod = Utils.getPreferredSortMethod(getActivity());
+            FetchMoviesTask movieTask = new FetchMoviesTask(getActivity());
 
-        try {
-            moveItem = movieTask.execute(sortMethod).get();
+            String sortMethod = Utils.getPreferredSortMethod(getActivity());
+
+            mMoveItem = movieTask.execute(sortMethod).get();
+
+            if(mMoveItem.size()==0)
+            {
+                Toast.makeText(getActivity(), R.string.info_no_connection_available,
+                        Toast.LENGTH_LONG).show();
+            }
+
         } catch (InterruptedException e) {
             e.printStackTrace();
         } catch (ExecutionException e) {
             e.printStackTrace();
         }
-
-        mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, moveItem);
     }
 
     @Override
     public void onStart(){
         super.onStart();
-        updateMoviesList();
-        mGridViewMovies.setAdapter(mMovieArrayAdapter);
+
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        outState.putParcelableArrayList(MOVIE_LIST_KEY, mMoveItem);
         if (mPosition != GridView.INVALID_POSITION) {
             outState.putInt(SELECTED_KEY, mPosition);
         }
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    public void onResume(){
+        super.onResume();
+        mGridViewMovies.smoothScrollToPosition(mPosition);
+
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            mPosition = savedInstanceState.getInt(SELECTED_KEY, 0);
+        }
+    }
 }
