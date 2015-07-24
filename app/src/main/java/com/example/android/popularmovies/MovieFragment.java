@@ -38,6 +38,19 @@ public class MovieFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        if(savedInstanceState == null)
+        {
+            updateMoviesList();
+
+        } else {
+            if(savedInstanceState.containsKey(MOVIE_LIST_KEY)){
+                mMoveItem = savedInstanceState.getParcelableArrayList(MOVIE_LIST_KEY);
+            }
+            if(savedInstanceState.containsKey(SELECTED_KEY)){
+                mPosition = savedInstanceState.getInt(SELECTED_KEY);
+            }
+        }
     }
 
     @Override
@@ -58,12 +71,6 @@ public class MovieFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         mGridViewMovies = (GridView) rootView.findViewById(R.id.grid_movie_images);
-
-        if(savedInstanceState == null || !savedInstanceState.containsKey(MOVIE_LIST_KEY)) {
-            updateMoviesList();
-        } else {
-            mMoveItem = savedInstanceState.getParcelableArrayList(MOVIE_LIST_KEY);
-        }
 
         mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, mMoveItem);
 
@@ -97,10 +104,6 @@ public class MovieFragment extends Fragment {
                 mPosition = firstVisibleItem;
             }
         });
-
-        if(savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)){
-            mPosition =  savedInstanceState.getInt(SELECTED_KEY);
-        }
 
         return  rootView;
     }
@@ -140,7 +143,6 @@ public class MovieFragment extends Fragment {
         if (mPosition != GridView.INVALID_POSITION) {
             outState.putInt(SELECTED_KEY, mPosition);
         }
-        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -153,8 +155,14 @@ public class MovieFragment extends Fragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-            mPosition = savedInstanceState.getInt(SELECTED_KEY, 0);
+
+        if(savedInstanceState != null){
+            if(savedInstanceState.containsKey(SELECTED_KEY)){
+                mPosition = savedInstanceState.getInt(SELECTED_KEY, 0);
+            }
+            if(savedInstanceState.containsKey(MOVIE_LIST_KEY)){
+                mMoveItem = savedInstanceState.getParcelableArrayList(MOVIE_LIST_KEY);
+            }
         }
     }
 }
