@@ -81,6 +81,10 @@
                             android:layout_gravity="left"
                             android:textStyle="bold"/>
                     </TableRow>
+                    <TableRow>
+                        <Button android:id="@+id/favorites_btn"
+                            android:text="@string/btn_favorite"/>
+                    </TableRow>
                 </TableLayout>
             </LinearLayout>
         </TableRow>

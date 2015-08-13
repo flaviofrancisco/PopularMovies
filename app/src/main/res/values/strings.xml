@@ -15,4 +15,5 @@
     <string name="format_full_friendly_rate"><xliff:g id="rate">%1$s</xliff:g>/10.0</string>
     <string name="info_no_connection_available">Sorry, this app is not able to retrieve the info about the movies. Please, check if this device has an internet connection!</string>
     <string name="databasename">popularmovies.db</string>
+    <string name="btn_favorite">Mark as favorite</string>
 </resources>

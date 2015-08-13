@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -16,6 +17,8 @@ import com.squareup.picasso.Picasso;
  * Created by Flavio on 7/12/2015.
  */
 public class DetailFragment extends Fragment {
+
+    private Button btnMarkAsFavorite;
 
     public DetailFragment() {
 
@@ -45,6 +48,16 @@ public class DetailFragment extends Fragment {
         String overview = intent.getStringExtra(MovieItem.OVERVIEW);
         ((TextView) rootView.findViewById(R.id.movie_synopsis)).setText(overview);
 
+        btnMarkAsFavorite = (Button) rootView.findViewById(R.id.favorites_btn);
+
+        btnMarkAsFavorite.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+
+            }
+
+        });
 
         return rootView;
     }
