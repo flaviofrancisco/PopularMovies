@@ -1,11 +1,8 @@
-package com.example.android.popularmovies;
+package com.example.android.popularmovies.data;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
-
-import com.example.android.popularmovies.data.PopularMoviesContract;
-import com.example.android.popularmovies.data.PopularMoviesDBHelper;
 
 import java.util.HashSet;
 

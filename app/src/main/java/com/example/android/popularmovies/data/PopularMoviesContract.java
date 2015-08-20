@@ -53,6 +53,7 @@ public class PopularMoviesContract {
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
+
     }
 
     public static final class MovieReviewEntry implements BaseColumns {
@@ -62,6 +63,7 @@ public class PopularMoviesContract {
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
+
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_REVIEW;
 
@@ -73,6 +75,13 @@ public class PopularMoviesContract {
 
         public static final String COLUMN_REVIEW_CONTENT = "content";
 
+        public static Uri buildReviewUri(String reviewId, long movieId) {
+            return CONTENT_URI.buildUpon().appendPath(reviewId).appendQueryParameter(COLUMN_MOVIE_ID, Long.toString(movieId)).build();
+        }
+
+        public static Uri buildTrailerUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
     }
 
     public static final class MovieTrailerEntry implements BaseColumns {
@@ -82,6 +91,7 @@ public class PopularMoviesContract {
 
         public static final String CONTENT_TYPE =
                 ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAILER;
+
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAILER;
 
@@ -92,6 +102,10 @@ public class PopularMoviesContract {
         public static final String COLUM_TRAILER_KEY = "key";
 
         public static final String COLUMN_TRAILER_NAME = "name";
+
+        public static Uri buildTrailerUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
 
     }
 }

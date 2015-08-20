@@ -71,7 +71,7 @@ public class PopularMoviesProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor retCursor;
 
-        switch (sUriMatcher.match(uri)){
+        switch (sUriMatcher.match(uri)) {
             case MOVIE: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         PopularMoviesContract.MovieEntry.TABLE_NAME,
@@ -82,9 +82,35 @@ public class PopularMoviesProvider extends ContentProvider {
                         null,
                         sortOrder
                 );
-                break;
             }
+            break;
+            case TRAILER: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        PopularMoviesContract.MovieTrailerEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+            }
+            break;
+            case REVIEW: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        PopularMoviesContract.MovieReviewEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+            }
+            break;
+            case MOVIE_WITH_REVIEW_AND_TRAILER:{
 
+            }
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -101,6 +127,12 @@ public class PopularMoviesProvider extends ContentProvider {
         switch (match){
             case MOVIE:
                 return PopularMoviesContract.MovieEntry.CONTENT_TYPE;
+            case TRAILER:
+                return PopularMoviesContract.MovieTrailerEntry.CONTENT_TYPE;
+            case REVIEW:
+                return PopularMoviesContract.MovieReviewEntry.CONTENT_TYPE;
+            case MOVIE_WITH_REVIEW_AND_TRAILER:
+                return PopularMoviesContract.MovieEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -119,6 +151,20 @@ public class PopularMoviesProvider extends ContentProvider {
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
+            case TRAILER:
+                _id = db.insert(PopularMoviesContract.MovieTrailerEntry.TABLE_NAME, null, values);
+                if(_id > 0)
+                    returnUri = PopularMoviesContract.MovieTrailerEntry.buildTrailerUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            case REVIEW:
+                _id = db.insert(PopularMoviesContract.MovieReviewEntry.TABLE_NAME, null, values);
+                if(_id > 0)
+                    returnUri = PopularMoviesContract.MovieReviewEntry.buildTrailerUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
@@ -129,12 +175,60 @@ public class PopularMoviesProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsDeleted;
+        // this makes delete all rows return the number of rows deleted
+        if ( null == selection ) selection = "1";
+        switch (match) {
+            case MOVIE:
+                rowsDeleted = db.delete(
+                        PopularMoviesContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case TRAILER:
+                rowsDeleted = db.delete(
+                        PopularMoviesContract.MovieTrailerEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case REVIEW:
+                rowsDeleted = db.delete(
+                        PopularMoviesContract.MovieReviewEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        // Because a null deletes all rows
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsDeleted;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        int rowsUpdated;
+
+        switch (match) {
+            case MOVIE:
+                rowsUpdated = db.update(PopularMoviesContract.MovieEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case TRAILER:
+                rowsUpdated = db.update(PopularMoviesContract.MovieTrailerEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case REVIEW:
+                rowsUpdated = db.update(PopularMoviesContract.MovieReviewEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
+        }
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
     }
 
 
