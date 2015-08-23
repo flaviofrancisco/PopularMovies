@@ -121,7 +121,8 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
                             cursor.getString(COL_POPULARITY),
                             cursor.getString(COL_VOTE_COUNT),
                             cursor.getString(COL_BACKDROP_PATH),
-                            cursor.getString(COL_TITLE)
+                            cursor.getString(COL_TITLE),
+                            true
                             );
 
                     ArrayList<MovieReview> reviews = getMovieReviewsDataFromDb(cursor.getString(COL_MOVIE_ID));
@@ -307,7 +308,8 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
                 String backdropPath = jsonObjectMovie.getString(MovieItem.BACKDROP_PATH);
                 String title = jsonObjectMovie.getString(MovieItem.TITLE);
 
-                movieItems[i] = new MovieItem(id, originalTitle, poster_path,overview, vote_average, release_date, popularity, voteCount, backdropPath, title);
+                movieItems[i] = new MovieItem(id, originalTitle, poster_path,overview, vote_average, release_date, popularity, voteCount, backdropPath, title, false);
+
                 movieItems[i].setMovieReviews(getMovieReviews(id));
                 movieItems[i].setMovieTrailers(getMovieTrailers(id));
 

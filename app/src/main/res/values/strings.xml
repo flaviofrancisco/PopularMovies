@@ -15,8 +15,10 @@
     <string name="title_activity_settings">Settings</string>
     <!-- Rate [CHAR LIMIT=NONE] -->
     <string name="format_full_friendly_rate"><xliff:g id="rate">%1$s</xliff:g>/10.0</string>
-    <string name="info_no_connection_available">Sorry, this app is not able to retrieve the info about the movies. Please, check if this device has an internet connection!</string>
+    <string name="info_no_connection_available">Please, check if this device has an internet connection!</string>
+    <string name="info_no_favorite_movies">There is no favorite movies</string>
     <string name="databasename">popularmovies.db</string>
     <string name="btn_favorite">Mark as favorite</string>
+    <string name="btn_delete_favorite">Remove from favorites</string>
     <string name="action_favorites">My Favorites</string>
 </resources>

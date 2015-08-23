@@ -32,6 +32,7 @@ public class MovieItem implements Serializable {
     private String voteCount;
     private String backdropPath;
     private String title;
+    private boolean isFavorite;
     private ArrayList<MovieReview> movieReviews;
     private ArrayList<MovieTrailer> movieTrailers;
 
@@ -132,6 +133,14 @@ public class MovieItem implements Serializable {
         this.backdropPath = backdropPath;
     }
 
+    public boolean isFavorite() {
+        return isFavorite;
+    }
+
+    public void setIsFavorite(boolean isFavorite) {
+        this.isFavorite = isFavorite;
+    }
+
     public String getTitle() {
         return title;
     }
@@ -150,7 +159,8 @@ public class MovieItem implements Serializable {
             String popularity,
             String voteCount,
             String backdropPath,
-            String title){
+            String title,
+            boolean isFavorite){
 
         setId(movieId);
         setOriginalTitle(originalTitle);
@@ -162,5 +172,6 @@ public class MovieItem implements Serializable {
         setVoteCount(voteCount);
         setBackdropPath(backdropPath);
         setTitle(title);
+        setIsFavorite(isFavorite);
     }
 }

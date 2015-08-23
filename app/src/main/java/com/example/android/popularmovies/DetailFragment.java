@@ -25,7 +25,6 @@ import com.squareup.picasso.Picasso;
 public class DetailFragment extends Fragment {
 
     private Button btnMarkAsFavorite;
-    private MovieCursorAdapter mMovieCursorAdapter;
     private MovieItem mSelectedMovie;
 
     private final String SELECTED_MOVIE_KEY = "selected_movie";
@@ -37,8 +36,6 @@ public class DetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        mMovieCursorAdapter = new MovieCursorAdapter(getActivity(), null, 0);
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
@@ -61,15 +58,24 @@ public class DetailFragment extends Fragment {
 
         btnMarkAsFavorite = (Button) rootView.findViewById(R.id.favorites_btn);
 
+        if(mSelectedMovie.isFavorite() || isAlreadyFavorite()){
+            btnMarkAsFavorite.setText(R.string.btn_delete_favorite);
+        } else {
+            btnMarkAsFavorite.setText(R.string.btn_favorite);
+        }
+
         btnMarkAsFavorite.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View view) {
 
-                if(isAlreadyFavorite()){
+                if(isAlreadyFavorite() || mSelectedMovie.isFavorite()){
                     deleteFavoriteMovie();
+                    btnMarkAsFavorite.setText(R.string.btn_favorite);
+                } else {
+                    insertNewFavoriteMovie();
+                    btnMarkAsFavorite.setText(R.string.btn_delete_favorite);
                 }
-                insertNewFavoriteMovie();
             }
 
         });
@@ -79,19 +85,19 @@ public class DetailFragment extends Fragment {
 
     private void deleteFavoriteMovie() {
 
-        int delete = getActivity().getContentResolver().delete(
+        getActivity().getContentResolver().delete(
                 PopularMoviesContract.MovieTrailerEntry.CONTENT_URI,
                 PopularMoviesContract.MovieTrailerEntry.COLUMN_MOVIE_ID + " = " + mSelectedMovie.getId(),
                 null
         );
 
-        delete = getActivity().getContentResolver().delete(
+        getActivity().getContentResolver().delete(
                 PopularMoviesContract.MovieReviewEntry.CONTENT_URI,
                 PopularMoviesContract.MovieReviewEntry.COLUMN_MOVIE_ID + " = " + mSelectedMovie.getId(),
                 null
         );
 
-        delete = getActivity().getContentResolver().delete(
+        getActivity().getContentResolver().delete(
                 PopularMoviesContract.MovieEntry.CONTENT_URI,
                 PopularMoviesContract.MovieEntry._ID + " = " + mSelectedMovie.getId(),
                 null

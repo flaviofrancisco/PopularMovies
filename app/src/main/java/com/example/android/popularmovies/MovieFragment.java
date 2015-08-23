@@ -118,8 +118,14 @@ public class MovieFragment extends Fragment {
 
             if(mMoveItem.size()==0)
             {
-                Toast.makeText(getActivity(), R.string.info_no_connection_available,
-                        Toast.LENGTH_LONG).show();
+                if(sortMethod == getActivity().getString(R.string.pref_sort_by_value_favorites)){
+                    Toast.makeText(getActivity(), R.string.info_no_favorite_movies,
+                            Toast.LENGTH_LONG).show();
+                }
+                else{
+                    Toast.makeText(getActivity(), R.string.info_no_connection_available,
+                            Toast.LENGTH_LONG).show();
+                }
             }
 
         } catch (InterruptedException e) {
