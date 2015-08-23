@@ -174,8 +174,12 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
                 String overview = jsonObjectMovie.getString(MovieItem.OVERVIEW);
                 String vote_average = mContext.getString(R.string.format_full_friendly_rate, jsonObjectMovie.getString(MovieItem.VOTE_AVERAGE));
                 String release_date = jsonObjectMovie.getString(MovieItem.RELEASE_DATE);
+                String popularity = jsonObjectMovie.getString(MovieItem.POPULARITY);
+                String voteCount = jsonObjectMovie.getString(MovieItem.VOTE_COUNT);
+                String backdropPath = jsonObjectMovie.getString(MovieItem.BACKDROP_PATH);
+                String title = jsonObjectMovie.getString(MovieItem.TITLE);
 
-                movieItems[i] = new MovieItem(id, originalTitle, poster_path,overview, vote_average, release_date);
+                movieItems[i] = new MovieItem(id, originalTitle, poster_path,overview, vote_average, release_date, popularity, voteCount, backdropPath, title);
                 movieItems[i].setMovieReviews(getMovieReviews(id));
                 movieItems[i].setMovieTrailers(getMovieTrailers(id));
 

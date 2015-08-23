@@ -20,6 +20,8 @@ public class MovieCursorAdapter extends CursorAdapter {
         super(context, c, flags);
     }
 
+
+
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         return null;

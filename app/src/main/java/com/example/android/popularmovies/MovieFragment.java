@@ -31,6 +31,7 @@ public class MovieFragment extends Fragment {
     private int mPosition = GridView.INVALID_POSITION;
     private final String MOVIE_LIST_KEY = "movie_list_key";
     private final String SELECTED_KEY="selected_position";
+    private final String SELECTED_MOVIE_KEY = "selected_movie";
 
     public MovieFragment(){ }
 
@@ -45,7 +46,7 @@ public class MovieFragment extends Fragment {
 
         } else {
             if(savedInstanceState.containsKey(MOVIE_LIST_KEY)){
-                //mMoveItem = savedInstanceState.getParcelableArrayList(MOVIE_LIST_KEY);
+                mMoveItem = (ArrayList<MovieItem>) savedInstanceState.getSerializable(MOVIE_LIST_KEY);
             }
             if(savedInstanceState.containsKey(SELECTED_KEY)){
                 mPosition = savedInstanceState.getInt(SELECTED_KEY);
@@ -82,14 +83,10 @@ public class MovieFragment extends Fragment {
                 public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
                     MovieItem movieInfo = (MovieItem) mMovieArrayAdapter.getItem(position);
-                    Intent intent = new Intent(getActivity(), DetailActivity.class);
 
-                    intent.putExtra(MovieItem.ORIGINAL_TITLE, movieInfo.getOriginalTitle());
-                    intent.putExtra(MovieItem.POSTER_PATH, movieInfo.getMoviePosterThumbnail());
-                    intent.putExtra(MovieItem.OVERVIEW, movieInfo.getSynopsis());
-                    intent.putExtra(MovieItem.RELEASE_DATE, movieInfo.getReleaseDate());
-                    intent.putExtra(MovieItem.VOTE_AVERAGE, movieInfo.getRating());
-                    intent.putExtra("movie", movieInfo);
+                    Intent intent = new Intent(getActivity(), DetailActivity.class);
+                    intent.putExtra(SELECTED_MOVIE_KEY, movieInfo);
+
                     startActivity(intent);
                 }
             });
@@ -140,7 +137,7 @@ public class MovieFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-       // outState.putParcelableArrayList(MOVIE_LIST_KEY, mMoveItem);
+        outState.putSerializable(MOVIE_LIST_KEY, mMoveItem);
         if (mPosition != GridView.INVALID_POSITION) {
             outState.putInt(SELECTED_KEY, mPosition);
         }
@@ -162,7 +159,7 @@ public class MovieFragment extends Fragment {
                 mPosition = savedInstanceState.getInt(SELECTED_KEY, 0);
             }
             if(savedInstanceState.containsKey(MOVIE_LIST_KEY)){
-              //  mMoveItem = savedInstanceState.getParcelableArrayList(MOVIE_LIST_KEY);
+                mMoveItem = (ArrayList<MovieItem>)savedInstanceState.getSerializable(MOVIE_LIST_KEY);
             }
         }
     }
