@@ -1,6 +1,7 @@
 package com.example.android.popularmovies;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.util.Log;
 import com.example.android.popularmovies.data.MovieItem;
 import com.example.android.popularmovies.data.MovieReview;
 import com.example.android.popularmovies.data.MovieTrailer;
+import com.example.android.popularmovies.data.PopularMoviesContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,7 +31,28 @@ import java.util.Arrays;
  */
 public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem>> {
 
+    private static final int COL_REVIEW_ID = 0;
+    private static final int COL_REVIEW_AUTHOR = 1;
+    private static final int COL_REVIEW_CONTENT = 2;
+    private static final int COL_REVIEW_MOVIE_ID = 3;
+    
+    private static final int COL_TRAILER_ID = 0;
+    private static final int COL_TRAILER_MOVIE_ID = 1;
+    private static final int COL_TRAILER_KEY = 2;
+    private static final int COL_TRAILER_NAME = 3;
+
     private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
+
+    public static final int COL_MOVIE_ID = 0;
+    public static final int COL_TITLE = 1;
+    public static final int COL_BACKDROP_PATH = 2;
+    public static final int COL_ORIGINAL_TITLE = 3;
+    public static final int COL_OVERVIEW =4;
+    public static final int COL_POPULARITY = 5;
+    public static final int COL_POSTER_PATH = 6;
+    public static final int COL_RELEASE_DATE = 7;
+    public static final int COL_VOTE_AVG = 8;
+    public static final int COL_VOTE_COUNT = 9;
 
 
     private static final String JSON_RESULTS = "results";
@@ -50,28 +73,133 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
             return null;
         }
 
+        ArrayList<MovieItem> movies = new ArrayList<>();
+
         try{
 
-            final String MOVIES_BASE_URL =
-                    "http://api.themoviedb.org/3/discover/movie?";
+            String retrieveMethod = params[0];
 
-            String QUERY_SORT_BY = "sort_by";
+            if(retrieveMethod != mContext.getString(R.string.pref_sort_by_value_favorites)){
+
+                final String MOVIES_BASE_URL =
+                        "http://api.themoviedb.org/3/discover/movie?";
+
+                String QUERY_SORT_BY = "sort_by";
 
 
-            Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
-                    .appendQueryParameter(QUERY_SORT_BY, params[0])
-                    .appendQueryParameter(QUERY_API_KEY, PARAM_API_KEY).build();
+                Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
+                        .appendQueryParameter(QUERY_SORT_BY, params[0])
+                        .appendQueryParameter(QUERY_API_KEY, PARAM_API_KEY).build();
 
-            String jsonResult = getJSONData(builtUri);
+                String jsonResult = getJSONData(builtUri);
 
-            return getMovieDataFromJson(jsonResult);
+                movies = getMovieDataFromJson(jsonResult);
+
+            }
+            else {
+
+                Cursor cursor = mContext.getContentResolver().query(
+                        PopularMoviesContract.MovieEntry.CONTENT_URI,
+                        null,   // projection
+                        null,   //where
+                        null,   // Values for the "where" clause
+                        null    // sort order
+                );
+
+                MovieItem[] movieItems = new MovieItem[cursor.getCount()];
+
+                int i = 0;
+
+                while (cursor.moveToNext()) {
+                    movieItems[i] = new MovieItem(
+                            cursor.getString(COL_MOVIE_ID),
+                            cursor.getString(COL_ORIGINAL_TITLE),
+                            cursor.getString(COL_POSTER_PATH),
+                            cursor.getString(COL_OVERVIEW),
+                            cursor.getString(COL_VOTE_AVG),
+                            cursor.getString(COL_RELEASE_DATE),
+                            cursor.getString(COL_POPULARITY),
+                            cursor.getString(COL_VOTE_COUNT),
+                            cursor.getString(COL_BACKDROP_PATH),
+                            cursor.getString(COL_TITLE)
+                            );
+
+                    ArrayList<MovieReview> reviews = getMovieReviewsDataFromDb(cursor.getString(COL_MOVIE_ID));
+                    ArrayList<MovieTrailer> trailers = getMovieTrailersDataFromDb(cursor.getString(COL_MOVIE_ID));
+
+                    movieItems[i].setMovieReviews(reviews);
+                    movieItems[i].setMovieTrailers(trailers);
+
+                    i++;
+                }
+
+                cursor.close();
+
+                movies = new ArrayList<>(Arrays.asList(movieItems));
+            }
 
         } catch (JSONException e){
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
 
-        return null;
+        return movies;
+    }
+
+    private ArrayList<MovieTrailer> getMovieTrailersDataFromDb(String movieId) {
+
+        ArrayList<MovieTrailer> movieTrailers;
+
+        Cursor cursor = mContext.getContentResolver().query(
+                PopularMoviesContract.MovieTrailerEntry.CONTENT_URI,
+                null,   // projection
+                PopularMoviesContract.MovieTrailerEntry.COLUMN_MOVIE_ID + " = " + movieId,   //where
+                null,   // Values for the "where" clause
+                null    // sort order
+        );
+
+        MovieTrailer[] items = new MovieTrailer[cursor.getCount()];
+
+        int i = 0;
+
+        while (cursor.moveToNext()) {
+
+            items[i] = new MovieTrailer(cursor.getString(COL_TRAILER_MOVIE_ID), cursor.getString(COL_TRAILER_ID),cursor.getString(COL_TRAILER_NAME), cursor.getString(COL_TRAILER_KEY));
+
+            i++;
+        }
+
+        movieTrailers = new ArrayList<>(Arrays.asList(items));
+
+        return movieTrailers;
+    }
+
+    private ArrayList<MovieReview> getMovieReviewsDataFromDb(String movieId) {
+
+        ArrayList<MovieReview> movieReviews;
+
+        Cursor cursor = mContext.getContentResolver().query(
+                PopularMoviesContract.MovieReviewEntry.CONTENT_URI,
+                null,   // projection
+                PopularMoviesContract.MovieReviewEntry.COLUMN_MOVIE_ID + " = " + movieId,   //where
+                null,   // Values for the "where" clause
+                null    // sort order
+        );
+
+        MovieReview[] items = new MovieReview[cursor.getCount()];
+
+        int i = 0;
+
+        while (cursor.moveToNext()) {
+
+            items[i] = new MovieReview(cursor.getString(COL_REVIEW_AUTHOR), cursor.getString(COL_REVIEW_ID), cursor.getString(COL_REVIEW_CONTENT), cursor.getString(COL_REVIEW_MOVIE_ID) );
+
+            i++;
+        }
+
+        movieReviews = new ArrayList<>(Arrays.asList(items));
+
+        return movieReviews;
     }
 
     private String getJSONData(Uri builtUri)

@@ -140,7 +140,17 @@ public class MovieItem implements Serializable {
         this.title = title;
     }
 
-    public MovieItem(String movieId, String originalTitle, String moviePoster, String overview, String vote_average, String releaseDate, String popularity, String voteCount, String backdropPath, String title){
+    public MovieItem(
+            String movieId,
+            String originalTitle,
+            String moviePoster,
+            String overview,
+            String vote_average,
+            String releaseDate,
+            String popularity,
+            String voteCount,
+            String backdropPath,
+            String title){
 
         setId(movieId);
         setOriginalTitle(originalTitle);
