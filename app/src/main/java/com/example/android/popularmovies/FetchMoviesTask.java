@@ -3,8 +3,11 @@ package com.example.android.popularmovies;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.example.android.popularmovies.data.MovieItem;
+import com.example.android.popularmovies.data.MovieReview;
+import com.example.android.popularmovies.data.MovieTrailer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -26,6 +29,14 @@ import java.util.Arrays;
  */
 public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem>> {
 
+    private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
+
+
+    private static final String JSON_RESULTS = "results";
+
+    private static final String QUERY_API_KEY="api_key";
+    private static final String PARAM_API_KEY ="d258b0a29b796a86edcd444ea07c951b";
+
     Context mContext;
 
     public FetchMoviesTask(Context context) {
@@ -39,30 +50,44 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
             return null;
         }
 
-        HttpURLConnection urlConnection = null;
-        BufferedReader reader = null;
-
-        String moviesJsonStr = null;
-
         try{
 
             final String MOVIES_BASE_URL =
                     "http://api.themoviedb.org/3/discover/movie?";
 
             String QUERY_SORT_BY = "sort_by";
-            String QUERY_API_KEY="api_key";
-            String PARAM_API_KEY ="d258b0a29b796a86edcd444ea07c951b";
+
 
             Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon()
                     .appendQueryParameter(QUERY_SORT_BY, params[0])
                     .appendQueryParameter(QUERY_API_KEY, PARAM_API_KEY).build();
+
+            String jsonResult = getJSONData(builtUri);
+
+            return getMovieDataFromJson(jsonResult);
+
+        } catch (JSONException e){
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    private String getJSONData(Uri builtUri)
+    {
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+        String result = null;
+
+        try{
 
             URL url = new URL(builtUri.toString());
 
             CheckConnectivity checkConnectivity = new CheckConnectivity();
 
             if(!checkConnectivity.isNetworkConnected(mContext) || checkConnectivity.isInternetAvailable(builtUri.toString())) {
-                return new ArrayList<>();
+                return null;
             }
 
             urlConnection = (HttpURLConnection) url.openConnection();
@@ -70,10 +95,13 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
             urlConnection.connect();
 
             InputStream inputStream = urlConnection.getInputStream();
+
             StringBuffer buffer = new StringBuffer();
+
             if (inputStream == null) {
                 return null;
             }
+
             reader = new BufferedReader(new InputStreamReader(inputStream));
 
             String line;
@@ -88,12 +116,12 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
                 // Stream was empty.  No point in parsing.
                 return null;
             }
-            moviesJsonStr = buffer.toString();
 
-            return getMovieDataFromJson(moviesJsonStr);
+            result = buffer.toString();
 
-        } catch (JSONException e){
-            e.printStackTrace();
+           return result;
+
+
         } catch (MalformedURLException e) {
             e.printStackTrace();
         } catch (ProtocolException e) {
@@ -110,7 +138,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
                 try {
                     reader.close();
                 } catch (final IOException e) {
-//                    Log.e(LOG_TAG, "Error closing stream", e);
+                    Log.e(LOG_TAG, "Error closing stream", e);
                 }
             }
         }
@@ -120,14 +148,19 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
 
     private ArrayList<MovieItem> getMovieDataFromJson(String moviesJsonStr) throws JSONException {
 
-        final String MOVIES_RESULTS = "results";
-
         try {
 
+            if(moviesJsonStr == null)
+                return new ArrayList<>();
+
             JSONObject moviesJson = new JSONObject(moviesJsonStr);
-            JSONArray resultsArray = moviesJson.getJSONArray(MOVIES_RESULTS);
+            JSONArray resultsArray = moviesJson.getJSONArray(JSON_RESULTS);
+
+            if(resultsArray == null)
+                return new ArrayList<>();
 
             int count = resultsArray.length();
+
             MovieItem[] movieItems = new MovieItem[count];
 
 
@@ -143,17 +176,126 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
                 String release_date = jsonObjectMovie.getString(MovieItem.RELEASE_DATE);
 
                 movieItems[i] = new MovieItem(id, originalTitle, poster_path,overview, vote_average, release_date);
+                movieItems[i].setMovieReviews(getMovieReviews(id));
+                movieItems[i].setMovieTrailers(getMovieTrailers(id));
 
             }
 
-            return new ArrayList<MovieItem>(Arrays.asList(movieItems));
+            return new ArrayList<>(Arrays.asList(movieItems));
 
         } catch (JSONException e) {
-//        Log.e(LOG_TAG, e.getMessage(), e);
-        e.printStackTrace();
+           Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
         }
 
-        return new ArrayList<MovieItem>();
+        return new ArrayList<>();
     }
 
+    private ArrayList<MovieTrailer> getMovieTrailers(String movieId) throws JSONException {
+
+        ArrayList<MovieTrailer> result = new ArrayList<>();
+
+        final String MOVIES_BASE_URL =
+                "https://api.themoviedb.org/3/movie/";
+
+        Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon().appendPath(movieId).appendPath("videos")
+                .appendQueryParameter(QUERY_API_KEY, PARAM_API_KEY).build();
+
+        String jsonResult = getJSONData(builtUri);
+
+        try {
+            result = getMovieTrailersDataFromJson(jsonResult, movieId);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    private ArrayList<MovieTrailer> getMovieTrailersDataFromJson(String jsonResult, String movieId) throws JSONException {
+
+        if(jsonResult == null)
+            return new ArrayList<>();
+
+        JSONObject moviesJson = new JSONObject(jsonResult);
+        JSONArray resultsArray = moviesJson.getJSONArray(JSON_RESULTS);
+
+        if(resultsArray == null)
+            return new ArrayList<>();
+
+        int count = resultsArray.length();
+
+        if(count == 0)
+            return new ArrayList<>();
+
+        MovieTrailer[] movieTrailers = new MovieTrailer[count];
+
+        for(int i = 0; i <= count - 1; i++) {
+
+            JSONObject jsonObjectMovie = resultsArray.getJSONObject(i);
+
+            String id = jsonObjectMovie.getString(MovieTrailer.ID);
+            String name = jsonObjectMovie.getString(MovieTrailer.NAME);
+            String key = jsonObjectMovie.getString(MovieTrailer.KEY);
+
+            movieTrailers[i] = new MovieTrailer(movieId, id, name,key);
+
+        }
+
+        return new ArrayList<>(Arrays.asList(movieTrailers));
+    }
+
+    private ArrayList<MovieReview> getMovieReviews(String movieId) throws JSONException {
+
+        ArrayList<MovieReview> result = new ArrayList<>();
+
+        final String MOVIES_BASE_URL =
+                "https://api.themoviedb.org/3/movie/";
+
+        Uri builtUri = Uri.parse(MOVIES_BASE_URL).buildUpon().appendPath(movieId).appendPath("reviews")
+                .appendQueryParameter(QUERY_API_KEY, PARAM_API_KEY).build();
+
+        String jsonResult = getJSONData(builtUri);
+
+        try {
+            result = getMovieReviewsDataFromJson(jsonResult, movieId);
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    private ArrayList<MovieReview> getMovieReviewsDataFromJson(String jsonResult, String movieId) throws JSONException {
+
+        JSONObject moviesJson = new JSONObject(jsonResult);
+        JSONArray resultsArray = moviesJson.getJSONArray(JSON_RESULTS);
+
+        if(resultsArray == null)
+            return new ArrayList<>();
+
+        int count = resultsArray.length();
+
+        if(count == 0)
+            return new ArrayList<>();
+
+        MovieReview[] movieReviews = new MovieReview[count];
+
+        for(int i = 0; i <= count - 1; i++) {
+
+            JSONObject jsonObjectMovie = resultsArray.getJSONObject(i);
+
+            String id = jsonObjectMovie.getString(MovieReview.ID);
+            String author = jsonObjectMovie.getString(MovieReview.AUTHOR);
+            String content = jsonObjectMovie.getString(MovieReview.CONTENT);
+
+            movieReviews[i] = new MovieReview(author, id, content,movieId);
+
+        }
+
+        return new ArrayList<>(Arrays.asList(movieReviews));
+
+    }
 }

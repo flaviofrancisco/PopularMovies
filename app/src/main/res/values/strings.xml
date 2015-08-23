@@ -16,4 +16,5 @@
     <string name="info_no_connection_available">Sorry, this app is not able to retrieve the info about the movies. Please, check if this device has an internet connection!</string>
     <string name="databasename">popularmovies.db</string>
     <string name="btn_favorite">Mark as favorite</string>
+    <string name="action_favorites">My Favorites</string>
 </resources>

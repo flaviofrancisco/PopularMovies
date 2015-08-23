@@ -32,6 +32,8 @@ public class DetailFragment extends Fragment {
 
         Intent intent = getActivity().getIntent();
 
+        MovieItem movieItem = (MovieItem)intent.getSerializableExtra("movie");
+
         String movieTitle = intent.getStringExtra(MovieItem.ORIGINAL_TITLE);
         ((TextView) rootView.findViewById(R.id.movie_title)).setText(movieTitle);
 

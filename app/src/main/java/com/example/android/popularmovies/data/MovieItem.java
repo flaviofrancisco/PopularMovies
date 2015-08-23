@@ -1,12 +1,15 @@
 package com.example.android.popularmovies.data;
 
 import android.os.Parcel;
-import android.os.Parcelable;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Flavio on 7/11/2015.
  */
-public class MovieItem implements Parcelable {
+public class MovieItem implements Serializable {
 
     public static final String POSTER_PATH = "poster_path";
     public static final String ORIGINAL_TITLE = "original_title";
@@ -21,6 +24,33 @@ public class MovieItem implements Parcelable {
     private String synopsis;
     private String rating;
     private String releaseDate;
+    private ArrayList<MovieReview> movieReviews;
+    private ArrayList<MovieTrailer> movieTrailers;
+
+    protected MovieItem(Parcel in) {
+        id = in.readString();
+        originalTitle = in.readString();
+        moviePosterThumbnail = in.readString();
+        synopsis = in.readString();
+        rating = in.readString();
+        releaseDate = in.readString();
+    }
+
+    public List<MovieReview> getMovieReviews() {
+        return movieReviews;
+    }
+
+    public void setMovieReviews(ArrayList<MovieReview> movieReviews) {
+        this.movieReviews = movieReviews;
+    }
+
+    public List<MovieTrailer> getMovieTrailers() {
+        return movieTrailers;
+    }
+
+    public void setMovieTrailers(ArrayList<MovieTrailer> movieTrailers) {
+        this.movieTrailers = movieTrailers;
+    }
 
     public String getId() {
         return id;
@@ -70,29 +100,13 @@ public class MovieItem implements Parcelable {
         this.releaseDate = releaseDate;
     }
 
-    public MovieItem(String movieId, String otitle, String moviePoster, String overview, String vote_average, String rdate){
+    public MovieItem(String movieId, String originalTitle, String moviePoster, String overview, String vote_average, String releaseDate){
 
         setId(movieId);
-        setOriginalTitle(otitle);
+        setOriginalTitle(originalTitle);
         setMoviePosterThumbnail(moviePoster);
         setSynopsis(overview);
         setRating(vote_average);
-        setReleaseDate(rdate);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(id);
-        dest.writeString(moviePosterThumbnail);
-        dest.writeString(originalTitle);
-        dest.writeString(moviePosterThumbnail);
-        dest.writeString(synopsis);
-        dest.writeString(rating);
-        dest.writeString(releaseDate);
+        setReleaseDate(releaseDate);
     }
 }

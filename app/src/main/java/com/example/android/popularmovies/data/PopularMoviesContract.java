@@ -40,7 +40,7 @@ public class PopularMoviesContract {
 
         public static final String COLUMN_MOVIE_POPULARITY = "popularity";
 
-        public static final String COLUMN_MOVIE_VOTE_AVG = "vote_avg";
+        public static final String COLUMN_MOVIE_VOTE_AVG = "vote_average";
 
         public static final String COLUMN_MOVIE_VOTE_COUNT = "vote_count";
 
