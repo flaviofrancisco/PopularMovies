@@ -24,8 +24,11 @@ import java.util.concurrent.ExecutionException;
  */
 public class MovieFragment extends Fragment {
 
+    private boolean mUseTwoPanesLayout;
     private GridView mGridViewMovies;
-    MovieArrayAdapter mMovieArrayAdapter;
+
+    private MovieArrayAdapter mMovieArrayAdapter;
+
     private ArrayList<MovieItem> mMoveItem;
 
     private int mPosition = GridView.INVALID_POSITION;
@@ -34,6 +37,13 @@ public class MovieFragment extends Fragment {
     private final String SELECTED_MOVIE_KEY = "selected_movie";
 
     public MovieFragment(){ }
+
+    public void setUseTwoPanesLayout(boolean useTwoPanesLayout){
+        mUseTwoPanesLayout = useTwoPanesLayout;
+        if(mUseTwoPanesLayout){
+
+        }
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

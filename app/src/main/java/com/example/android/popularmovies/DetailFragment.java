@@ -43,42 +43,44 @@ public class DetailFragment extends Fragment {
 
         mSelectedMovie = (MovieItem)intent.getSerializableExtra(SELECTED_MOVIE_KEY);
 
-        String movieTitle = mSelectedMovie.getOriginalTitle();
-        String moviePoster = mSelectedMovie.getMoviePosterThumbnail();
-        String releaseDate = mSelectedMovie.getReleaseDate();
-        String vote_average = mSelectedMovie.getRating();
-        String overview = mSelectedMovie.getSynopsis();
+        if(mSelectedMovie != null){
+            String movieTitle = mSelectedMovie.getOriginalTitle();
+            String moviePoster = mSelectedMovie.getMoviePosterThumbnail();
+            String releaseDate = mSelectedMovie.getReleaseDate();
+            String vote_average = mSelectedMovie.getRating();
+            String overview = mSelectedMovie.getSynopsis();
 
-        ((TextView) rootView.findViewById(R.id.movie_title)).setText(movieTitle);
-        ImageView imageView = ((ImageView) rootView.findViewById(R.id.movie_poster));
-        Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w92//" + moviePoster).into(imageView);
-        ((TextView) rootView.findViewById(R.id.release_date)).setText(releaseDate);
-        ((TextView) rootView.findViewById(R.id.users_rating)).setText(vote_average);
-        ((TextView) rootView.findViewById(R.id.movie_synopsis)).setText(overview);
+            ((TextView) rootView.findViewById(R.id.movie_title)).setText(movieTitle);
+            ImageView imageView = ((ImageView) rootView.findViewById(R.id.movie_poster));
+            Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w92//" + moviePoster).into(imageView);
+            ((TextView) rootView.findViewById(R.id.release_date)).setText(releaseDate);
+            ((TextView) rootView.findViewById(R.id.users_rating)).setText(vote_average);
+            ((TextView) rootView.findViewById(R.id.movie_synopsis)).setText(overview);
 
-        btnMarkAsFavorite = (Button) rootView.findViewById(R.id.favorites_btn);
+            btnMarkAsFavorite = (Button) rootView.findViewById(R.id.favorites_btn);
 
-        if(mSelectedMovie.isFavorite() || isAlreadyFavorite()){
-            btnMarkAsFavorite.setText(R.string.btn_delete_favorite);
-        } else {
-            btnMarkAsFavorite.setText(R.string.btn_favorite);
-        }
-
-        btnMarkAsFavorite.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-
-                if(isAlreadyFavorite() || mSelectedMovie.isFavorite()){
-                    deleteFavoriteMovie();
-                    btnMarkAsFavorite.setText(R.string.btn_favorite);
-                } else {
-                    insertNewFavoriteMovie();
-                    btnMarkAsFavorite.setText(R.string.btn_delete_favorite);
-                }
+            if(mSelectedMovie.isFavorite() || isAlreadyFavorite()){
+                btnMarkAsFavorite.setText(R.string.btn_delete_favorite);
+            } else {
+                btnMarkAsFavorite.setText(R.string.btn_favorite);
             }
 
-        });
+            btnMarkAsFavorite.setOnClickListener(new View.OnClickListener() {
+
+                @Override
+                public void onClick(View view) {
+
+                    if(isAlreadyFavorite() || mSelectedMovie.isFavorite()){
+                        deleteFavoriteMovie();
+                        btnMarkAsFavorite.setText(R.string.btn_favorite);
+                    } else {
+                        insertNewFavoriteMovie();
+                        btnMarkAsFavorite.setText(R.string.btn_delete_favorite);
+                    }
+                }
+
+            });
+        }
 
         return rootView;
     }

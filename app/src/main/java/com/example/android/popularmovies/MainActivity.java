@@ -9,11 +9,35 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private static final String DETAILFRAGMENT_TAG = "DFTAG";
+
+    private boolean mTwoPane;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_main);
-        getSupportActionBar().setElevation(0f);
+
+        if (findViewById(R.id.movie_detail_container) != null) {
+            mTwoPane = true;
+            if (savedInstanceState == null) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.movie_detail_container, new DetailFragment(), DETAILFRAGMENT_TAG)
+                        .commit();
+            }
+        } else {
+            mTwoPane = false;
+            getSupportActionBar().setElevation(0f);
+        }
+
+        MovieFragment movieFragment =
+                ((MovieFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_movie));
+
+        movieFragment.setUseTwoPanesLayout(mTwoPane);
+
     }
 
     @Override
@@ -39,4 +63,9 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+    }
 }
