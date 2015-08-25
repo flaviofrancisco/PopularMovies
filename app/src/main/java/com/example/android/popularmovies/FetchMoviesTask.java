@@ -73,8 +73,6 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
             return null;
         }
 
-        ArrayList<MovieItem> movies = new ArrayList<>();
-
         try{
 
             String retrieveMethod = params[0];
@@ -93,7 +91,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
 
                 String jsonResult = getJSONData(builtUri);
 
-                movies = getMovieDataFromJson(jsonResult);
+                return getMovieDataFromJson(jsonResult);
 
             }
             else {
@@ -136,15 +134,14 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
 
                 cursor.close();
 
-                movies = new ArrayList<>(Arrays.asList(movieItems));
+                return new ArrayList<>(Arrays.asList(movieItems));
             }
 
         } catch (JSONException e){
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
+            return new ArrayList<MovieItem>();
         }
-
-        return movies;
     }
 
     private ArrayList<MovieTrailer> getMovieTrailersDataFromDb(String movieId) {

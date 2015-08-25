@@ -1,6 +1,5 @@
 package com.example.android.popularmovies;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -29,12 +28,17 @@ public class MovieFragment extends Fragment {
 
     private MovieArrayAdapter mMovieArrayAdapter;
 
-    private ArrayList<MovieItem> mMoveItem;
+    private ArrayList<MovieItem> _movies;
+
+    private MovieItem _selectedMovie;
+
+    public MovieItem get_selectedMovie() {
+        return _selectedMovie;
+    }
 
     private int mPosition = GridView.INVALID_POSITION;
     private final String MOVIE_LIST_KEY = "movie_list_key";
     private final String SELECTED_KEY="selected_position";
-    private final String SELECTED_MOVIE_KEY = "selected_movie";
 
     public MovieFragment(){ }
 
@@ -54,12 +58,21 @@ public class MovieFragment extends Fragment {
         {
             updateMoviesList();
 
+            if(_movies != null && _movies.size() >0){
+                _selectedMovie = _movies.get(0);
+            }
+
         } else {
             if(savedInstanceState.containsKey(MOVIE_LIST_KEY)){
-                mMoveItem = (ArrayList<MovieItem>) savedInstanceState.getSerializable(MOVIE_LIST_KEY);
+                _movies = (ArrayList<MovieItem>) savedInstanceState.getSerializable(MOVIE_LIST_KEY);
             }
             if(savedInstanceState.containsKey(SELECTED_KEY)){
+
                 mPosition = savedInstanceState.getInt(SELECTED_KEY);
+
+                if(_movies != null && _movies.size() >0){
+                    _selectedMovie = _movies.get(mPosition);
+                }
             }
         }
     }
@@ -83,7 +96,7 @@ public class MovieFragment extends Fragment {
 
         mGridViewMovies = (GridView) rootView.findViewById(R.id.grid_movie_images);
 
-        mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, mMoveItem);
+        mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, _movies);
 
             mGridViewMovies.setAdapter(mMovieArrayAdapter);
 
@@ -94,10 +107,8 @@ public class MovieFragment extends Fragment {
 
                     MovieItem movieInfo = (MovieItem) mMovieArrayAdapter.getItem(position);
 
-                    Intent intent = new Intent(getActivity(), DetailActivity.class);
-                    intent.putExtra(SELECTED_MOVIE_KEY, movieInfo);
+                    ((Callback) getActivity()).onItemSelected(movieInfo);
 
-                    startActivity(intent);
                 }
             });
 
@@ -116,7 +127,7 @@ public class MovieFragment extends Fragment {
         return  rootView;
     }
 
-    private void updateMoviesList() {
+    public void updateMoviesList() {
 
         try{
 
@@ -124,9 +135,9 @@ public class MovieFragment extends Fragment {
 
             String sortMethod = Utils.getPreferredSortMethod(getActivity());
 
-            mMoveItem = movieTask.execute(sortMethod).get();
+            _movies = movieTask.execute(sortMethod).get();
 
-            if(mMoveItem.size()==0)
+            if(_movies.size()==0)
             {
                 if(sortMethod == getActivity().getString(R.string.pref_sort_by_value_favorites)){
                     Toast.makeText(getActivity(), R.string.info_no_favorite_movies,
@@ -153,7 +164,7 @@ public class MovieFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(MOVIE_LIST_KEY, mMoveItem);
+        outState.putSerializable(MOVIE_LIST_KEY, _movies);
         if (mPosition != GridView.INVALID_POSITION) {
             outState.putInt(SELECTED_KEY, mPosition);
         }
@@ -175,7 +186,7 @@ public class MovieFragment extends Fragment {
                 mPosition = savedInstanceState.getInt(SELECTED_KEY, 0);
             }
             if(savedInstanceState.containsKey(MOVIE_LIST_KEY)){
-                mMoveItem = (ArrayList<MovieItem>)savedInstanceState.getSerializable(MOVIE_LIST_KEY);
+                _movies = (ArrayList<MovieItem>)savedInstanceState.getSerializable(MOVIE_LIST_KEY);
             }
         }
     }

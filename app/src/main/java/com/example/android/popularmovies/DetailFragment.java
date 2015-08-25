@@ -27,7 +27,7 @@ public class DetailFragment extends Fragment {
     private Button btnMarkAsFavorite;
     private MovieItem mSelectedMovie;
 
-    private final String SELECTED_MOVIE_KEY = "selected_movie";
+    public static final String SELECTED_MOVIE_KEY = "selected_movie";
 
     public DetailFragment() {
 
@@ -39,9 +39,18 @@ public class DetailFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        Intent intent = getActivity().getIntent();
+        Bundle args = getArguments();
 
-        mSelectedMovie = (MovieItem)intent.getSerializableExtra(SELECTED_MOVIE_KEY);
+        MovieItem movieItem;
+
+        if(args != null){
+            movieItem = (MovieItem)args.getSerializable(SELECTED_MOVIE_KEY);
+        } else {
+            Intent intent = getActivity().getIntent();
+            movieItem = (MovieItem)intent.getSerializableExtra(SELECTED_MOVIE_KEY);
+        }
+
+        mSelectedMovie = movieItem;
 
         if(mSelectedMovie != null){
             String movieTitle = mSelectedMovie.getOriginalTitle();
@@ -191,4 +200,8 @@ public class DetailFragment extends Fragment {
         return data;
     }
 
+    public void onMovieDetailChanged(MovieItem movieItem) {
+
+        mSelectedMovie = movieItem;
+    }
 }
