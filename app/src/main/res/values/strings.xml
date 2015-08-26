@@ -21,4 +21,6 @@
     <string name="btn_favorite">Mark as favorite</string>
     <string name="btn_delete_favorite">Remove from favorites</string>
     <string name="action_favorites">My Favorites</string>
+    <string name="reviews">Reviews</string>
+    <string name="trailers">Trailers</string>
 </resources>

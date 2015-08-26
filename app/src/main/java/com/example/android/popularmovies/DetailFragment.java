@@ -61,7 +61,7 @@ public class DetailFragment extends Fragment {
 
             showTrailers(rootView);
 
-            //showReviews(rootView);
+            showReviews(rootView);
 
             btnMarkAsFavorite.setOnClickListener(new View.OnClickListener() {
 
@@ -164,7 +164,7 @@ public class DetailFragment extends Fragment {
 
             textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
-            textView.setText(review.getContent());
+            textView.setText("\"" + review.getContent() + "\"" + "\n -" + review.getAuthor() + "\n\n" );
 
             list_of_reviews.addView(textView);
 
