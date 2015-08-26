@@ -162,7 +162,7 @@ public class DetailFragment extends Fragment {
 
             textView.setId(i);
 
-            textView.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.2f));
+            textView.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
             textView.setText(review.getContent());
 

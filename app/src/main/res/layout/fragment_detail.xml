@@ -13,18 +13,19 @@
         android:paddingRight="0dp"
         android:paddingTop="0dp"
         tools:context="com.example.android.popularmovies.DetailFragment"
-        android:stretchColumns="0,1"
+        android:stretchColumns="0"
         android:gravity="fill_horizontal|fill_vertical">
 
         <TableRow
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_weight="1"
+            android:layout_span="2"
             android:layout_margin="0dp"
             android:layout_height="99dp"
             android:layout_gravity="top"
             android:gravity="center_vertical|center_horizontal">
             <TextView
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="@dimen/detail_movie_title_height"
                 android:id="@+id/movie_title"
                 android:layout_span="2"
@@ -37,7 +38,7 @@
         </TableRow>
 
         <TableRow
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
@@ -48,20 +49,19 @@
             <LinearLayout
                 android:layout_span="2"
                 android:orientation="horizontal"
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="fill_parent">
                 <ImageView
                     android:id="@+id/movie_poster"
                     android:layout_width="@dimen/detail_movie_poster_width"
                     android:layout_height="@dimen/detail_movie_poster_height"/>
                 <TableLayout
-                    android:layout_width="fill_parent"
+                    android:layout_width="match_parent"
                     android:layout_marginLeft="10dp"
                     android:layout_marginTop="0dp"
                     android:layout_marginRight="10dp"
                     android:layout_marginBottom="0dp"
-                    android:stretchColumns="0"
-                    android:layout_height="fill_parent">
+                    android:layout_height="wrap_content">
                     <TableRow
                         android:gravity="center_vertical|fill_vertical">
                         <TextView
@@ -94,6 +94,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:gravity="left"
+            android:layout_span="2"
             android:textAlignment="gravity">
 
             <TextView
@@ -108,7 +109,6 @@
         </TableRow>
 
         <TableRow
-            android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <LinearLayout
@@ -121,16 +121,30 @@
         </TableRow>
 
         <TableRow
-            android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <LinearLayout
-                android:id="@+id/list_of_reviews"
+                android:id="@+id/layout_reviews_wrapper"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:orientation="vertical">
-
+                <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TableRow
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+                        <LinearLayout
+                            android:id="@+id/list_of_reviews"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:orientation="vertical">
+                        </LinearLayout>
+                    </TableRow>
+                </TableLayout>
             </LinearLayout>
         </TableRow>
 
