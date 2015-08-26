@@ -6,11 +6,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.android.popularmovies.data.MovieItem;
@@ -26,6 +28,7 @@ public class DetailFragment extends Fragment {
 
     private Button btnMarkAsFavorite;
     private MovieItem mSelectedMovie;
+    private MovieTrailer mMovieTrailer;
 
     public static final String SELECTED_MOVIE_KEY = "selected_movie";
 
@@ -53,33 +56,19 @@ public class DetailFragment extends Fragment {
         mSelectedMovie = movieItem;
 
         if(mSelectedMovie != null){
-            String movieTitle = mSelectedMovie.getOriginalTitle();
-            String moviePoster = mSelectedMovie.getMoviePosterThumbnail();
-            String releaseDate = mSelectedMovie.getReleaseDate();
-            String vote_average = mSelectedMovie.getRating();
-            String overview = mSelectedMovie.getSynopsis();
 
-            ((TextView) rootView.findViewById(R.id.movie_title)).setText(movieTitle);
-            ImageView imageView = ((ImageView) rootView.findViewById(R.id.movie_poster));
-            Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w92//" + moviePoster).into(imageView);
-            ((TextView) rootView.findViewById(R.id.release_date)).setText(releaseDate);
-            ((TextView) rootView.findViewById(R.id.users_rating)).setText(vote_average);
-            ((TextView) rootView.findViewById(R.id.movie_synopsis)).setText(overview);
+            bindControls(rootView);
 
-            btnMarkAsFavorite = (Button) rootView.findViewById(R.id.favorites_btn);
+            showTrailers(rootView);
 
-            if(mSelectedMovie.isFavorite() || isAlreadyFavorite()){
-                btnMarkAsFavorite.setText(R.string.btn_delete_favorite);
-            } else {
-                btnMarkAsFavorite.setText(R.string.btn_favorite);
-            }
+            //showReviews(rootView);
 
             btnMarkAsFavorite.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
 
-                    if(isAlreadyFavorite() || mSelectedMovie.isFavorite()){
+                    if (isAlreadyFavorite() || mSelectedMovie.isFavorite()) {
                         deleteFavoriteMovie();
                         btnMarkAsFavorite.setText(R.string.btn_favorite);
                     } else {
@@ -92,6 +81,96 @@ public class DetailFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+    private void bindControls(View rootView) {
+        String movieTitle = mSelectedMovie.getOriginalTitle();
+        String moviePoster = mSelectedMovie.getMoviePosterThumbnail();
+        String releaseDate = mSelectedMovie.getReleaseDate();
+        String vote_average = mSelectedMovie.getRating();
+        String overview = mSelectedMovie.getSynopsis();
+
+        ((TextView) rootView.findViewById(R.id.movie_title)).setText(movieTitle);
+        ImageView imageView = ((ImageView) rootView.findViewById(R.id.movie_poster));
+        Picasso.with(getActivity()).load("http://image.tmdb.org/t/p/w92//" + moviePoster).into(imageView);
+        ((TextView) rootView.findViewById(R.id.release_date)).setText(releaseDate);
+        ((TextView) rootView.findViewById(R.id.users_rating)).setText(vote_average);
+        ((TextView) rootView.findViewById(R.id.movie_synopsis)).setText(overview);
+
+        btnMarkAsFavorite = (Button) rootView.findViewById(R.id.favorites_btn);
+
+        if(mSelectedMovie.isFavorite() || isAlreadyFavorite()){
+            btnMarkAsFavorite.setText(R.string.btn_delete_favorite);
+        } else {
+            btnMarkAsFavorite.setText(R.string.btn_favorite);
+        }
+    }
+
+    private void showTrailers(View rootView) {
+        int i = 0;
+
+        for (MovieTrailer trailer : mSelectedMovie.getMovieTrailers()) {
+
+            LinearLayout list_of_trailers = ((LinearLayout) rootView.findViewById(R.id.list_of_trailers));
+
+            list_of_trailers.setGravity(Gravity.CENTER);
+
+            Button btnTrailer = new Button(getActivity());
+
+            LinearLayout.LayoutParams parms = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+
+            btnTrailer.setLayoutParams(parms);
+
+            btnTrailer.setText(trailer.getName());
+
+            btnTrailer.setId(i);
+
+            mMovieTrailer = trailer;
+
+            btnTrailer.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+
+                    final String YOUTUBE_BASE_URL =
+                            "https://www.youtube.com/";
+
+                    final String WATCH = "watch";
+
+                    Uri builtUri = Uri.parse(YOUTUBE_BASE_URL).buildUpon().appendPath(WATCH)
+                            .appendQueryParameter("v", mMovieTrailer.getKey()).build();
+
+                    getActivity().startActivity(new Intent(Intent.ACTION_VIEW, builtUri));
+                }
+            });
+
+            list_of_trailers.addView(btnTrailer);
+
+            i++;
+
+        }
+    }
+
+    private void showReviews(View rootView) {
+
+        int i;
+        i = 0;
+
+        for (MovieReview review : mSelectedMovie.getMovieReviews()) {
+
+            LinearLayout list_of_reviews = ((LinearLayout) rootView.findViewById(R.id.list_of_reviews));
+
+            TextView textView = new TextView(getActivity());
+
+            textView.setId(i);
+
+            textView.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 0.2f));
+
+            textView.setText(review.getContent());
+
+            list_of_reviews.addView(textView);
+
+            i++;
+
+        }
     }
 
     private void deleteFavoriteMovie() {
