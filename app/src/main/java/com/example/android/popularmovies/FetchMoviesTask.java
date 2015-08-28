@@ -77,7 +77,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
 
             String retrieveMethod = params[0];
 
-            if(retrieveMethod != mContext.getString(R.string.pref_sort_by_value_favorites)){
+            if(!retrieveMethod.equals(mContext.getString(R.string.pref_sort_by_value_favorites))){
 
                 final String MOVIES_BASE_URL =
                         "http://api.themoviedb.org/3/discover/movie?";

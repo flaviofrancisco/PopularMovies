@@ -14,6 +14,7 @@ implements SharedPreferences.OnSharedPreferenceChangeListener
 {
     private final int SORT_BY_POPULAR = 0;
     private final int SORT_BY_RATED = 1;
+    private final int SORT_BY_MY_FAVORITES = 2;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -34,8 +35,14 @@ implements SharedPreferences.OnSharedPreferenceChangeListener
 
         if(sortByValue.equals(getActivity().getString(R.string.pref_sort_by_value_popular))){
             listPreferenceSortBy.setSummary(entries[SORT_BY_POPULAR]);
-        } else {
+        }
+
+        if(sortByValue.equals(getActivity().getString(R.string.pref_sort_by_value_rated))){
             listPreferenceSortBy.setSummary(entries[SORT_BY_RATED]);
+        }
+
+        if(sortByValue.equals(getActivity().getString(R.string.pref_sort_by_value_favorites))){
+            listPreferenceSortBy.setSummary(entries[SORT_BY_MY_FAVORITES]);
         }
     }
 

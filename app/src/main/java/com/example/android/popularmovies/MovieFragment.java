@@ -139,7 +139,7 @@ public class MovieFragment extends Fragment {
 
             if(_movies.size()==0)
             {
-                if(sortMethod == getActivity().getString(R.string.pref_sort_by_value_favorites)){
+                if(sortMethod.equals(getActivity().getString(R.string.pref_sort_by_value_favorites))){
                     Toast.makeText(getActivity(), R.string.info_no_favorite_movies,
                             Toast.LENGTH_LONG).show();
                 }
@@ -190,4 +190,5 @@ public class MovieFragment extends Fragment {
             }
         }
     }
+
 }

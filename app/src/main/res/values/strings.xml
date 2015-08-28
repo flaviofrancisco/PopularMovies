@@ -23,4 +23,6 @@
     <string name="action_favorites">My Favorites</string>
     <string name="reviews">Reviews</string>
     <string name="trailers">Trailers</string>
+    <string name="action_share">Share</string>
+    <string name="no_trailer_available">Sorry! No trailer available.</string>
 </resources>

@@ -6,8 +6,13 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.ShareActionProvider;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,6 +37,8 @@ public class DetailFragment extends Fragment {
 
     public static final String SELECTED_MOVIE_KEY = "selected_movie";
 
+    private ShareActionProvider mShareActionProvider;
+
     public DetailFragment() {
 
     }
@@ -39,7 +46,7 @@ public class DetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        setHasOptionsMenu(true);
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 
         Bundle args = getArguments();
@@ -81,6 +88,37 @@ public class DetailFragment extends Fragment {
         }
 
         return rootView;
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        inflater.inflate(R.menu.detailfragment, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+
+        mShareActionProvider.setShareIntent(createShareMovieTrailerIntent());
+    }
+
+    private Intent createShareMovieTrailerIntent() {
+
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+
+        if(mSelectedMovie != null && mSelectedMovie.getMovieTrailers() != null && mSelectedMovie.getMovieTrailers().size() > 0){
+
+            MovieTrailer trailer = mSelectedMovie.getMovieTrailers().get(0);
+
+            Uri builtUri = getMovieTrailerUri(trailer);
+
+            shareIntent.putExtra(Intent.EXTRA_TEXT, builtUri.toString());
+        }
+
+        return shareIntent;
+
     }
 
     private void bindControls(View rootView) {
@@ -130,13 +168,7 @@ public class DetailFragment extends Fragment {
             btnTrailer.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
 
-                    final String YOUTUBE_BASE_URL =
-                            "https://www.youtube.com/";
-
-                    final String WATCH = "watch";
-
-                    Uri builtUri = Uri.parse(YOUTUBE_BASE_URL).buildUpon().appendPath(WATCH)
-                            .appendQueryParameter("v", mMovieTrailer.getKey()).build();
+                    Uri builtUri = getMovieTrailerUri(mMovieTrailer);
 
                     getActivity().startActivity(new Intent(Intent.ACTION_VIEW, builtUri));
                 }
@@ -147,6 +179,16 @@ public class DetailFragment extends Fragment {
             i++;
 
         }
+    }
+
+    private Uri getMovieTrailerUri(MovieTrailer movieTrailer) {
+        final String YOUTUBE_BASE_URL =
+                "https://www.youtube.com/";
+
+        final String WATCH = "watch";
+
+        return Uri.parse(YOUTUBE_BASE_URL).buildUpon().appendPath(WATCH)
+                .appendQueryParameter("v", movieTrailer.getKey()).build();
     }
 
     private void showReviews(View rootView) {
@@ -279,8 +321,4 @@ public class DetailFragment extends Fragment {
         return data;
     }
 
-    public void onMovieDetailChanged(MovieItem movieItem) {
-
-        mSelectedMovie = movieItem;
-    }
 }
