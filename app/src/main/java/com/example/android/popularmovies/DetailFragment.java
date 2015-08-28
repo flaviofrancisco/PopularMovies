@@ -108,13 +108,18 @@ public class DetailFragment extends Fragment {
         shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
         shareIntent.setType("text/plain");
 
-        if(mSelectedMovie != null && mSelectedMovie.getMovieTrailers() != null && mSelectedMovie.getMovieTrailers().size() > 0){
+        if(mSelectedMovie != null && mSelectedMovie.getMovieTrailers() != null){
 
-            MovieTrailer trailer = mSelectedMovie.getMovieTrailers().get(0);
+            if(mSelectedMovie.getMovieTrailers().size() > 0) {
+                MovieTrailer trailer = mSelectedMovie.getMovieTrailers().get(0);
 
-            Uri builtUri = getMovieTrailerUri(trailer);
+                Uri builtUri = getMovieTrailerUri(trailer);
 
-            shareIntent.putExtra(Intent.EXTRA_TEXT, builtUri.toString());
+                shareIntent.putExtra(Intent.EXTRA_TEXT, builtUri.toString());
+            } else {
+                shareIntent.putExtra(Intent.EXTRA_TEXT, mSelectedMovie.getTitle() + "(" + mSelectedMovie.getOriginalTitle() + ")");
+            }
+
         }
 
         return shareIntent;
