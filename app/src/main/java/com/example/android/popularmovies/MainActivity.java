@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity implements Callback {
 
         movieFragment =
                 ((MovieFragment)getSupportFragmentManager().findFragmentById(R.id.fragment_movie));
+
         movieFragment.setUseTwoPanesLayout(mTwoPane);
 
     }
@@ -91,9 +92,7 @@ public class MainActivity extends AppCompatActivity implements Callback {
 
             mSortMethod = sortMethod;
         }
-
     }
-
 
     @Override
     public void onItemSelected(MovieItem movieItem) {
@@ -114,5 +113,10 @@ public class MainActivity extends AppCompatActivity implements Callback {
                     .putExtra(DetailFragment.SELECTED_MOVIE_KEY, movieItem);
             startActivity(intent);
         }
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
     }
 }

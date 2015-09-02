@@ -25,6 +25,7 @@ public class MovieFragment extends Fragment {
 
     private boolean mUseTwoPanesLayout;
     private GridView mGridViewMovies;
+    private String mSortMethod;
 
     private MovieArrayAdapter mMovieArrayAdapter;
 
@@ -53,6 +54,8 @@ public class MovieFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        mSortMethod = Utils.getPreferredSortMethod(getActivity());
 
         if(savedInstanceState == null)
         {
@@ -98,19 +101,19 @@ public class MovieFragment extends Fragment {
 
         mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, _movies);
 
-            mGridViewMovies.setAdapter(mMovieArrayAdapter);
+        mGridViewMovies.setAdapter(mMovieArrayAdapter);
 
-            mGridViewMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mGridViewMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
-                    MovieItem movieInfo = (MovieItem) mMovieArrayAdapter.getItem(position);
+                MovieItem movieInfo = (MovieItem) mMovieArrayAdapter.getItem(position);
 
-                    ((Callback) getActivity()).onItemSelected(movieInfo);
+                ((Callback) getActivity()).onItemSelected(movieInfo);
 
-                }
-            });
+            }
+        });
 
         mGridViewMovies.setOnScrollListener(new AbsListView.OnScrollListener() {
             @Override
@@ -159,7 +162,6 @@ public class MovieFragment extends Fragment {
     @Override
     public void onStart(){
         super.onStart();
-
     }
 
     @Override
@@ -173,7 +175,20 @@ public class MovieFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        mGridViewMovies.smoothScrollToPosition(mPosition);
+
+        String sortMethod = Utils.getPreferredSortMethod(getActivity());
+
+        if(sortMethod != null && !sortMethod.equals(mSortMethod)){
+
+            updateMoviesList();
+
+            mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, _movies);
+
+            mGridViewMovies.setAdapter(mMovieArrayAdapter);
+
+        } else {
+            mGridViewMovies.smoothScrollToPosition(mPosition);
+        }
 
     }
 
@@ -190,5 +205,4 @@ public class MovieFragment extends Fragment {
             }
         }
     }
-
 }
