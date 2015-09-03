@@ -44,6 +44,7 @@ public class MovieArrayAdapter extends ArrayAdapter {
         } else {
             holder = (ViewHolder) row.getTag();
         }
+
         Picasso.with(mContext).load("http://image.tmdb.org/t/p/w185//" + mMoviesInfo.get(position).getMoviePosterThumbnail()).into(holder.image);
 
         return row;

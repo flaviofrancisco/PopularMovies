@@ -16,7 +16,6 @@ import android.widget.Toast;
 import com.example.android.popularmovies.data.MovieItem;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Created by Flavio on 7/11/2015.
@@ -99,6 +98,10 @@ public class MovieFragment extends Fragment {
 
         mGridViewMovies = (GridView) rootView.findViewById(R.id.grid_movie_images);
 
+        if(_movies == null){
+            _movies = new ArrayList<>();
+        }
+
         mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, _movies);
 
         mGridViewMovies.setAdapter(mMovieArrayAdapter);
@@ -132,31 +135,18 @@ public class MovieFragment extends Fragment {
 
     public void updateMoviesList() {
 
-        try{
+            FetchMoviesTask movieTask = new FetchMoviesTask(new FragmentCallback(){
 
-            FetchMoviesTask movieTask = new FetchMoviesTask(getActivity());
+                @Override
+                public void onTaskDone(ArrayList<MovieItem> result) {
+                    taskIsDone(result);
+                }
+            }, getActivity());
 
             String sortMethod = Utils.getPreferredSortMethod(getActivity());
 
-            _movies = movieTask.execute(sortMethod).get();
+             movieTask.execute(sortMethod);
 
-            if(_movies.size()==0)
-            {
-                if(sortMethod.equals(getActivity().getString(R.string.pref_sort_by_value_favorites))){
-                    Toast.makeText(getActivity(), R.string.info_no_favorite_movies,
-                            Toast.LENGTH_LONG).show();
-                }
-                else{
-                    Toast.makeText(getActivity(), R.string.info_no_connection_available,
-                            Toast.LENGTH_LONG).show();
-                }
-            }
-
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        }
     }
 
     @Override
@@ -178,18 +168,11 @@ public class MovieFragment extends Fragment {
 
         String sortMethod = Utils.getPreferredSortMethod(getActivity());
 
-        if(sortMethod != null && !sortMethod.equals(mSortMethod)){
+        if((sortMethod != null && !sortMethod.equals(mSortMethod))){
 
             updateMoviesList();
 
-            mMovieArrayAdapter = new MovieArrayAdapter(getActivity(), R.layout.list_item_movie_image, _movies);
-
-            mGridViewMovies.setAdapter(mMovieArrayAdapter);
-
-        } else {
-            mGridViewMovies.smoothScrollToPosition(mPosition);
         }
-
     }
 
     @Override
@@ -204,5 +187,34 @@ public class MovieFragment extends Fragment {
                 _movies = (ArrayList<MovieItem>)savedInstanceState.getSerializable(MOVIE_LIST_KEY);
             }
         }
+    }
+
+    private void taskIsDone(ArrayList<MovieItem> result){
+
+        mSortMethod =  Utils.getPreferredSortMethod(getActivity());
+
+        _movies = result;
+
+        if(_movies.size()==0)
+        {
+            if(mSortMethod.equals(getActivity().getString(R.string.pref_sort_by_value_favorites))){
+                Toast.makeText(getActivity(), R.string.info_no_favorite_movies,
+                        Toast.LENGTH_LONG).show();
+            }
+            else{
+                Toast.makeText(getActivity(), R.string.info_no_connection_available,
+                        Toast.LENGTH_LONG).show();
+            }
+        } else {
+
+            mMovieArrayAdapter.clear();
+            mMovieArrayAdapter.addAll(_movies);
+            mMovieArrayAdapter.notifyDataSetChanged();
+        }
+
+    }
+
+    public interface FragmentCallback {
+        public void onTaskDone(ArrayList<MovieItem> result);
     }
 }

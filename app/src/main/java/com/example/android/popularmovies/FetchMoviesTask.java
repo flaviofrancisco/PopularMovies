@@ -1,9 +1,11 @@
 package com.example.android.popularmovies;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
 import com.example.android.popularmovies.data.MovieItem;
@@ -61,9 +63,14 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
     private static final String PARAM_API_KEY ="d258b0a29b796a86edcd444ea07c951b";
 
     Context mContext;
+    private MovieFragment.FragmentCallback mFragmentCallback;
 
-    public FetchMoviesTask(Context context) {
+    private ProgressDialog dialog;
+
+    public FetchMoviesTask(MovieFragment.FragmentCallback fragmentCallback, FragmentActivity context) {
         mContext = context;
+        mFragmentCallback = fragmentCallback;
+        dialog = new ProgressDialog(context);
     }
 
     @Override
@@ -76,6 +83,8 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
         try{
 
             String retrieveMethod = params[0];
+
+            ArrayList<MovieItem> result = new ArrayList<MovieItem>();
 
             if(!retrieveMethod.equals(mContext.getString(R.string.pref_sort_by_value_favorites))){
 
@@ -91,7 +100,7 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
 
                 String jsonResult = getJSONData(builtUri);
 
-                return getMovieDataFromJson(jsonResult);
+                result = getMovieDataFromJson(jsonResult);
 
             }
             else {
@@ -134,14 +143,31 @@ public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<MovieItem
 
                 cursor.close();
 
-                return new ArrayList<>(Arrays.asList(movieItems));
+                result = new ArrayList<>(Arrays.asList(movieItems));
             }
+
+            return result;
 
         } catch (JSONException e){
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
             return new ArrayList<MovieItem>();
         }
+    }
+
+    /** progress dialog to show user that the backup is processing. */
+    /** application context. */
+    @Override
+    protected void onPreExecute() {
+
+        this.dialog.setMessage("Please wait ...");
+        this.dialog.show();
+    }
+
+    @Override
+    protected void onPostExecute(ArrayList<MovieItem> result){
+        mFragmentCallback.onTaskDone(result);
+        this.dialog.hide();
     }
 
     private ArrayList<MovieTrailer> getMovieTrailersDataFromDb(String movieId) {
